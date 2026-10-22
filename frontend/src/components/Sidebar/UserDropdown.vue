@@ -73,7 +73,6 @@ import { sessionStore } from '@/stores/session'
 import { call, createResource, Dropdown, toast } from 'frappe-ui'
 import { useRouter } from 'vue-router'
 import { convertToTitleCase } from '@/utils'
-import { setThemePreference, themePreference } from '@/utils/theme'
 import { usersStore } from '@/stores/user'
 import { useSettings } from '@/stores/settings'
 import { h, computed } from 'vue'
@@ -161,30 +160,6 @@ const userDropdownOptions = computed(() => {
 					condition: () => {
 						return isLoggedIn
 					},
-				},
-				{
-					icon: 'lucide-sun-moon',
-					label: __('Theme'),
-					submenu: [
-						{
-							icon: 'lucide-sun',
-							label: __('Light'),
-							selected: themePreference.value === 'light',
-							onClick: () => setThemePreference('light'),
-						},
-						{
-							icon: 'lucide-moon',
-							label: __('Dark'),
-							selected: themePreference.value === 'dark',
-							onClick: () => setThemePreference('dark'),
-						},
-						{
-							icon: 'lucide-monitor',
-							label: __('System'),
-							selected: themePreference.value === 'system',
-							onClick: () => setThemePreference('system'),
-						},
-					],
 				},
 				{
 					icon: 'lucide-layout-grid',
