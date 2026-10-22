@@ -1,11 +1,4 @@
-/**
- * The user menu's Theme row. Before this conversion it toggled light/dark only
- * — the tri-state 'system' preference `utils/theme.ts` already supports had no
- * way into the UI. It is now a submenu (Light/Dark/System), matching the
- * pattern frappe-ui's Dropdown docs show for a theme switcher in a user menu
- * (stories/UserMenu.vue) — not the full `ThemeSwitcher` component, which is
- * for a settings panel, not a menu row.
- */
+/** Dark-only LMS must not offer an appearance switch in the user menu. */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
@@ -67,43 +60,12 @@ function build() {
 	return mount(UserDropdown, { global: { mocks: { __: (t: string) => t } } })
 }
 
-function themeMenu(wrapper: ReturnType<typeof build>) {
-	const options = wrapper.findComponent({ name: 'Dropdown' }).props('options')
-	const group = options[0].options as any[]
-	return group.find((option) => option.label === 'Theme')
-}
-
-describe('UserDropdown theme menu', () => {
-	beforeEach(() => {
-		setThemePreference('system')
-	})
-
-	afterEach(() => {
-		setThemePreference('system')
-	})
-
-	it('offers Light, Dark and System', () => {
-		const menu = themeMenu(build())
-		expect(menu.submenu.map((item: any) => item.label)).toEqual([
-			'Light',
-			'Dark',
-			'System',
-		])
-	})
-
-	it('marks the current preference selected', () => {
-		setThemePreference('dark')
-		const menu = themeMenu(build())
-		const selected = menu.submenu.filter((item: any) => item.selected)
-		expect(selected.map((item: any) => item.label)).toEqual(['Dark'])
-	})
-
-	it('sets the preference when a theme is picked', () => {
-		const menu = themeMenu(build())
-		menu.submenu.find((item: any) => item.label === 'Light').onClick()
-		expect(themePreference.value).toBe('light')
-
-		menu.submenu.find((item: any) => item.label === 'System').onClick()
-		expect(themePreference.value).toBe('system')
+describe('UserDropdown dark-only menu', () => {
+	it('does not expose a theme selector', () => {
+		setThemePreference('light')
+		expect(themePreference.value).toBe('dark')
+		const options = build().findComponent({ name: 'Dropdown' }).props('options')
+		const labels = options.flatMap((group: any) => group.options.map((item: any) => item.label))
+		expect(labels).not.toContain('Theme')
 	})
 })
