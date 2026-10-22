@@ -60,11 +60,18 @@ const documentBackground = (): string => {
 
 // The colour the browser would paint the canvas under a given data-theme. An
 // absent attribute is `null` — the untreated first-paint state.
-const paintedDocument = (theme: string | null): string =>
-	documentBackground().replace(
-		/var\((--[\w-]+)\)/g,
-		(_, name) => themeVariables(theme === 'dark' ? 'dark' : 'light')[name]
+const paintedDocument = (theme: string | null): string => {
+	// The LMS theme can override frappe-ui's default semantic surface token.
+	const css = readFileSync(resolve(ROOT, 'src/index.css'), 'utf8')
+	const darkOverride = css.match(/--surface-base:\\s*(#[0-9a-fA-F]{6})\\s*;/)?.[1]
+	return documentBackground().replace(
+		/var\\((--[\\w-]+)\\)/g,
+		(_, name) =>
+			theme === 'dark' && name === '--surface-base' && darkOverride
+				? darkOverride
+				: themeVariables(theme === 'dark' ? 'dark' : 'light')[name]
 	)
+}
 
 const html = readFileSync(resolve(ROOT, 'index.html'), 'utf8')
 
@@ -148,7 +155,7 @@ describe('dark-only appearance before first paint', () => {
 		]
 		for (const scenario of scenarios) {
 			expect(runBootstrap(scenario)).toBe('dark')
-			expect(paintedDocument('dark')).toBe('#171717')
+			expect(paintedDocument('dark')).toBe('#0a0a0a')
 			expect(await runComposable(scenario)).toBe('dark')
 		}
 	})
