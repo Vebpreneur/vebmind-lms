@@ -134,70 +134,24 @@ afterEach(() => {
 	document.documentElement.removeAttribute('data-theme')
 })
 
-describe('the theme applied before first paint', () => {
-	it('leaves the document white when nothing sets data-theme', () => {
-		expect(paintedDocument(null)).toBe('#ffffff')
-	})
-
-	it('paints the canvas dark for a dark visitor with no stored preference', () => {
-		const theme = runBootstrap({ stored: {}, systemDark: true })
-
-		expect(theme).toBe('dark')
-		expect(paintedDocument(theme)).toBe('#171717')
-	})
-
-	it('honours an explicit dark choice made on a light system', () => {
-		const theme = runBootstrap({
-			stored: { themePreference: 'dark' },
-			systemDark: false,
-		})
-
-		expect(theme).toBe('dark')
-		expect(paintedDocument(theme)).toBe('#171717')
-	})
-
-	it('honours an explicit light choice made on a dark system', () => {
-		const theme = runBootstrap({
-			stored: { themePreference: 'light' },
-			systemDark: true,
-		})
-
-		expect(theme).toBe('light')
-		expect(paintedDocument(theme)).toBe('#ffffff')
-	})
-
-	it('carries over the legacy single-key choice of an existing user', () => {
-		const theme = runBootstrap({ stored: { theme: 'dark' }, systemDark: false })
-
-		expect(theme).toBe('dark')
-		expect(paintedDocument(theme)).toBe('#171717')
-	})
-
-	// The rules are stated twice — once inline, once in the composable — because
-	// nothing that imports can run before the stylesheet paints. This is what
-	// keeps the two copies from drifting.
-	it('resolves exactly what src/utils/theme.ts resolves', async () => {
+describe('dark-only appearance before first paint', () => {
+	it('sets dark for every stored preference and OS preference', async () => {
 		const scenarios: Scenario[] = [
-			{ stored: {}, systemDark: true },
 			{ stored: {}, systemDark: false },
-			{ stored: { themePreference: 'dark' }, systemDark: false },
-			{ stored: { themePreference: 'light' }, systemDark: true },
-			{ stored: { themePreference: 'system' }, systemDark: true },
-			{ stored: { theme: 'dark' }, systemDark: false },
+			{ stored: {}, systemDark: true },
+			{ stored: { themePreference: 'light' }, systemDark: false },
+			{ stored: { themePreference: 'system' }, systemDark: false },
 			{ stored: { theme: 'light' }, systemDark: true },
-			{ stored: { themePreference: 'nonsense' }, systemDark: true },
 		]
-
 		for (const scenario of scenarios) {
-			expect(runBootstrap(scenario)).toBe(await runComposable(scenario))
+			expect(runBootstrap(scenario)).toBe('dark')
+			expect(paintedDocument('dark')).toBe('#171717')
+			expect(await runComposable(scenario)).toBe('dark')
 		}
 	})
-
-	// Placed in <head>, ahead of the stylesheet vite injects at the end of it, so
-	// the attribute is already there when the first paint is unblocked.
-	it('runs in the head, before anything that can paint', () => {
+	it('bootstraps dark in the head, before the stylesheet', () => {
 		const head = html.slice(html.indexOf('<head>'), html.indexOf('</head>'))
-
 		expect(head).toContain(bootstrapSource())
+		expect(html).toContain('data-theme="dark"')
 	})
 })
