@@ -15,7 +15,7 @@
    styles `html, body` from the same token set. */
 html {
 	background-color: var(--surface-base);
-	color-scheme: light;
+	color-scheme: dark;
 }
 
 /* Icons are 1.5 stroke everywhere. frappe-ui already normalises the two lucide
