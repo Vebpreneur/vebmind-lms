@@ -88,11 +88,28 @@ main#main-content {
 	background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='%230F0F0F' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
 }
 
-/* This build makes --surface-sidebar transparent in dark mode; point it at
-   gray-1 so the sidebar keeps a visible surface. */
+/* Vercel-inspired near-black theme. Keep the existing Frappe UI semantic tokens
+   so cards, dialogs, dropdowns, sidebars and forms share one cohesive palette.
+   Only active under dark mode; dark-only behavior is enforced in theme.ts. */
 [data-theme='dark'] {
 	color-scheme: dark;
-	--surface-sidebar: var(--surface-gray-1);
+	--surface-base: #0a0a0a;
+	--surface-white: #0a0a0a;
+	--surface-gray-1: #111111;
+	--surface-gray-2: #171717;
+	--surface-gray-3: #202020;
+	--surface-gray-4: #292929;
+	--surface-sidebar: #0d0d0d;
+	--outline-gray-1: #242424;
+	--outline-gray-2: #303030;
+	--outline-gray-3: #404040;
+}
+
+/* Carry the near-black canvas into the viewport gutter and native surfaces. */
+html[data-theme='dark'],
+html[data-theme='dark'] body {
+	background-color: var(--surface-base);
+	color-scheme: dark;
 }
 
 /* frappe-ui beta.7 FormLabel differs from InputLabel; match standalone labels
