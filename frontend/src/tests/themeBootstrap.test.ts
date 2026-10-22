@@ -102,7 +102,10 @@ const runBootstrap = ({ stored, systemDark }: Scenario): string | null => {
 	const windowStub = {
 		matchMedia: (query: string) => mediaQueryList(query, systemDark),
 	}
-	const storageStub = { getItem: (key: string) => stored[key] ?? null }
+	const storageStub = {
+		getItem: (key: string) => stored[key] ?? null,
+		setItem: (key: string, value: string) => { stored[key] = value },
+	}
 	new Function('window', 'document', 'localStorage', bootstrapSource())(
 		windowStub,
 		documentStub,
